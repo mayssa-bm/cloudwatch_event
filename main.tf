@@ -1,14 +1,18 @@
 /******************** lambda function *********************/
-
+data "archive_file" "zipit" {
+  type        = "zip"
+  source_file = "base-resource-lambda.py"
+  output_path = "lambda.zip"
+}
 /*set up lambda function  to start and stop instances***/
 
 
 resource "aws_lambda_function" "ec2-stop-start" {
-  filename      = "start-stop-ec2-instances.zip"
+  filename      = "lambda.zip"
   function_name = "base-resource-lambda"
   role          = aws_iam_role.lambda-role.arn
   handler       = "base-resource-lambda.lambda_handler"
-  source_code_hash = filebase64sha256("start-stop-ec2-instances.zip")
+  source_code_hash = "${data.archive_file.zipit.output_base64sha256}"
 
   runtime = "python3.7"
   timeout = 63
